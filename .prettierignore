@@ -1,0 +1,8 @@
+node_modules
+dist
+.wrangler
+pnpm-lock.yaml
+package-lock.json
+bun.lock
+routeTree.gen.ts
+public/tesseract

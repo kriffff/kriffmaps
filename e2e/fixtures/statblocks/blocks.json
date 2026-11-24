@@ -1,0 +1,214 @@
+[
+  {
+    "file": "marsh-hag-chanter.png",
+    "header": "#f6d6bd",
+    "name": "Marsh Hag Chanter",
+    "level": 2,
+    "organization": "Platoon",
+    "role": "Support",
+    "keywords": "Fey, Hag",
+    "ev": "EV 8",
+    "stats": ["1M", "5", "35", "0", "3"],
+    "chars": ["0", "+1", "+2", "+1", "+2"],
+    "abilities": [
+      ["Bog Dirge 2d10 + 2", "Signature Ability"],
+      ["Magic, Ranged, Strike", "Main action"],
+      ["Ranged 10", "One creature or object"],
+      ["Mire Chorus", ""],
+      ["Area, Magic", "Main action"]
+    ],
+    "expect": {
+      "name": "Marsh Hag Chanter",
+      "stamina": 35,
+      "level": 2,
+      "organization": "Platoon",
+      "role": "Support",
+      "ev": 8
+    }
+  },
+  {
+    "file": "ember-wisp.png",
+    "header": "#f1c9cf",
+    "name": "Ember Wisp",
+    "level": 3,
+    "organization": "Horde",
+    "role": "Harrier",
+    "keywords": "Elemental, Fire",
+    "ev": "EV 5",
+    "stats": ["1T", "7", "25", "0", "2"],
+    "chars": ["-1", "+3", "0", "+1", "0"],
+    "weakness": "Cold 5",
+    "abilities": [
+      ["Searing Flicker 2d10 + 3", "Signature Ability"],
+      ["Magic, Melee, Strike", "Main action"],
+      ["Melee 1", "One creature or object"]
+    ],
+    "expect": {
+      "name": "Ember Wisp",
+      "stamina": 25,
+      "level": 3,
+      "organization": "Horde",
+      "role": "Harrier",
+      "ev": 5
+    }
+  },
+  {
+    "file": "bone-rattler.png",
+    "header": "#f1c9cf",
+    "name": "Bone Rattler",
+    "level": 2,
+    "organization": "Minion",
+    "role": "Artillery",
+    "keywords": "Skeleton, Undead",
+    "ev": "EV 4 for four minions",
+    "stats": ["1S", "5", "6", "0", "2"],
+    "chars": ["0", "+2", "-1", "0", "-2"],
+    "weakness": "Holy 3",
+    "captain": "+1 bonus to ranged distance",
+    "abilities": [
+      ["Rattling Volley 2d10 + 2", "Signature Ability"],
+      ["Ranged, Strike, Weapon", "Main action"],
+      ["Ranged 12", "One creature per minion"]
+    ],
+    "expect": {
+      "name": "Bone Rattler",
+      "stamina": 6,
+      "level": 2,
+      "organization": "Minion",
+      "role": "Artillery",
+      "ev": 4,
+      "minions": 4
+    }
+  },
+  {
+    "file": "tunnel-wyrm.png",
+    "header": "#dcdcdc",
+    "columns": 2,
+    "name": "Tunnel Wyrm",
+    "level": 3,
+    "organization": "Solo",
+    "role": "",
+    "keywords": "Beast, Wyrm",
+    "ev": "EV 40",
+    "stats": ["3", "6", "220", "3", "6"],
+    "chars": ["+4", "+1", "-2", "+1", "-3"],
+    "movement": "Burrow",
+    "abilities": [
+      ["Solo Monster", ""],
+      ["End Effect: At the end of each of their turns, the wyrm can take 5 damage", ""],
+      ["Solo Turns: The wyrm can take two turns each round.", ""],
+      ["Crushing Coil 2d10 + 4", "Signature Ability"]
+    ],
+    "right": [
+      ["Rockfall", "3 Malice"],
+      ["Area", "Main action"],
+      ["4 burst", "Each enemy in the area"],
+      ["Tremor", ""],
+      ["Area", "Maneuver"],
+      ["Gravel Gust 2d10 + 4", "Villain Action 1"],
+      ["Area, Weapon", ""],
+      ["8 x 2 line within 1", "Each creature and object"]
+    ],
+    "expect": {
+      "name": "Tunnel Wyrm",
+      "stamina": 220,
+      "level": 3,
+      "organization": "Solo",
+      "ev": 40
+    }
+  },
+  {
+    "file": "storm-duelist.png",
+    "header": "#f3b3b3",
+    "name": "Storm Duelist",
+    "level": 3,
+    "organization": "Elite",
+    "role": "Controller",
+    "keywords": "Humanoid, Duelist",
+    "ev": "EV 18",
+    "stats": ["1M", "6", "70", "1", "5"],
+    "chars": ["+1", "+2", "+2", "0", "0"],
+    "abilities": [
+      ["Lightning Riposte 2d10 + 2", "Signature Ability"],
+      ["Magic, Melee, Strike", "Main action"],
+      ["Melee 2", "Two creatures or objects"]
+    ],
+    "expect": {
+      "name": "Storm Duelist",
+      "stamina": 70,
+      "level": 3,
+      "organization": "Elite",
+      "role": "Controller",
+      "ev": 18
+    }
+  },
+  {
+    "file": "rat-king.png",
+    "header": "#dcdcdc",
+    "columns": 2,
+    "name": "Rat King",
+    "level": 2,
+    "organization": "Leader",
+    "role": "",
+    "keywords": "Beast, Ratfolk",
+    "ev": "EV 14",
+    "stats": ["1S", "5", "90", "1", "4"],
+    "chars": ["0", "+3", "+1", "+1", "+2"],
+    "movement": "Climb",
+    "abilities": [
+      ["Gnawing Crown 2d10 + 3", "Signature Ability"],
+      ["Melee, Strike, Weapon", "Main action"],
+      ["Melee 1", "Two creatures or objects"]
+    ],
+    "right": [
+      ["Swarm Call", ""],
+      ["The king summons rats from every crack in the floor.", ""],
+      ["Scatter!", "Villain Action 1"],
+      ["Area", ""],
+      ["8 burst", "Each ally in the area"]
+    ],
+    "expect": { "name": "Rat King", "stamina": 90, "level": 2, "organization": "Leader", "ev": 14 }
+  },
+  {
+    "file": "bridge-warden-and-river-captain.png",
+    "header": "#dcdcdc",
+    "pair": true,
+    "name": "Bridge Warden",
+    "level": 2,
+    "organization": "Leader",
+    "role": "",
+    "keywords": "Human, Humanoid",
+    "ev": "EV 14",
+    "stats": ["1M", "5", "85", "2", "4"],
+    "chars": ["+3", "+1", "+1", "0", "+2"],
+    "immunity": "Poison 2",
+    "abilities": [
+      ["Halberd Sweep 2d10 + 2", "Signature Ability"],
+      ["Area, Weapon", "Main action"],
+      ["1 burst", "Each enemy in the area"]
+    ],
+    "second": {
+      "name": "River Captain",
+      "level": 4,
+      "organization": "Leader",
+      "role": "",
+      "keywords": "Human, Humanoid",
+      "ev": "EV 22",
+      "stats": ["1M", "5", "130", "2", "5"],
+      "chars": ["+2", "+3", "+2", "+2", "+2"],
+      "immunity": "Poison 4",
+      "abilities": [
+        ["Boarding Cutlass 2d10 + 2", "Signature Ability"],
+        ["Melee, Strike, Weapon", "Main action"],
+        ["Melee 1", "Two enemies or objects"]
+      ]
+    },
+    "expect": {
+      "name": "Bridge Warden",
+      "stamina": 85,
+      "level": 2,
+      "organization": "Leader",
+      "ev": 14
+    }
+  }
+]
