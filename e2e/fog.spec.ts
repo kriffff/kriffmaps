@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { displayMap, pickMapFolder, watchErrors } from "./helpers";
+import { displayMap, idbKeys, pickMapFolder, watchErrors } from "./helpers";
 
 /** RGB of the Map View canvas a little off-centre (the centre can sit on a grid line) */
 const tablePixel = (table: Page) =>
@@ -56,8 +56,8 @@ test("fog painting reaches the Map View, and undo/redo keep both screens in step
   await page.keyboard.press("Control+Shift+z");
   await expect.poll(() => tablePixel(table)).toEqual(MAP_GREEN);
 
-  // the redone fog is what's saved
-  await page.waitForTimeout(1000);
+  // changes are saved as soon as they're made: reloading a moment later keeps them
+  await page.waitForTimeout(300);
   await page.reload();
   await pickMapFolder(page);
   await page.getByRole("button", { name: /^stage$/i }).click();
@@ -114,4 +114,23 @@ test("combat shortcuts end turns and start rounds, but not while typing", async 
 
   await page.keyboard.press("?");
   await expect(page.getByRole("heading", { name: "Keyboard shortcuts" })).toBeVisible();
+});
+
+test("painting and switching map tab at once saves the fog to the right map (regression)", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await pickMapFolder(page);
+  await displayMap(page, "City", "market.png");
+  await page.getByRole("button", { name: /^library$/i }).click();
+  await page.getByText("Dungeons", { exact: true }).first().click();
+  await page.locator('img[alt="crypt.png"]').first().click();
+  await page.getByRole("button", { name: /Preview on Stage/ }).click();
+  await page.getByRole("button", { name: "market.png" }).click();
+
+  // paint, then switch tab well inside the 0.7 s save delay
+  await paintCentre(page);
+  await page.getByRole("button", { name: "crypt.png" }).click();
+  await page.waitForTimeout(1500);
+  await expect.poll(async () => (await idbKeys(page))["fog"]).toEqual(["City/market.png"]);
 });

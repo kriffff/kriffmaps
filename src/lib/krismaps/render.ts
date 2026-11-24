@@ -205,3 +205,10 @@ export function writeMaskAlpha(mask: HTMLCanvasElement, alpha: Uint8ClampedArray
   for (let i = 0; i < alpha.length; i++) image.data[i * 4 + 3] = alpha[i]!;
   ctx.putImageData(image, 0, 0);
 }
+
+/** like maskToBlob, but synchronous (for saving while the page unloads) */
+export function maskToBlobSync(mask: HTMLCanvasElement): Blob {
+  const [head, data] = mask.toDataURL("image/png").split(",");
+  const bytes = Uint8Array.from(atob(data ?? ""), (c) => c.charCodeAt(0));
+  return new Blob([bytes], { type: head?.match(/:(.*?);/)?.[1] ?? "image/png" });
+}

@@ -9,6 +9,7 @@ import {
   drawScene,
   fillMask,
   maskToBlob,
+  maskToBlobSync,
   readMaskAlpha,
   screenToImage,
   strokeMask,
@@ -130,16 +131,64 @@ export const DirectorStage = forwardRef<DirectorStageHandle, Props>(function Dir
     });
   }, []);
 
+  /** the fog save waiting to happen: which map, and that map's mask */
+  const pendingSave = useRef<{ path: string; mask: HTMLCanvasElement } | null>(null);
+
   const persistMask = useCallback(() => {
+    const current = entryRef.current;
+    const mask = maskRef.current;
+    if (!current || !mask) return;
+    // remember *which* map this is now: by the time the timer fires the user
+    // may have switched tabs, and the new map's fog must not be overwritten
+    pendingSave.current = { path: current.path, mask };
     if (saveTimer.current) window.clearTimeout(saveTimer.current);
     saveTimer.current = window.setTimeout(async () => {
-      const current = entryRef.current;
-      const mask = maskRef.current;
-      if (!current || !mask) return;
-      const blob = await maskToBlob(mask);
-      if (blob) await idbSet(STORE_FOG, current.path, blob);
+      saveTimer.current = null;
+      const pending = pendingSave.current;
+      pendingSave.current = null;
+      if (!pending) return;
+      const blob = await maskToBlob(pending.mask);
+      if (blob) await idbSet(STORE_FOG, pending.path, blob);
     }, 700);
   }, []);
+
+  /** save this map's fog now (end of a stroke, undo/redo, fills) */
+  const saveNow = useCallback(() => {
+    persistMask();
+    if (saveTimer.current) window.clearTimeout(saveTimer.current);
+    saveTimer.current = null;
+    const pending = pendingSave.current;
+    pendingSave.current = null;
+    if (!pending) return;
+    void maskToBlob(pending.mask)
+      .then((blob) => (blob ? idbSet(STORE_FOG, pending.path, blob) : undefined))
+      .catch(() => undefined);
+  }, [persistMask]);
+
+  // A save is debounced by 0.7 s. If the page is hidden, reloaded or closed,
+  // or the map changes, within that window, save straight away, encoding the
+  // mask synchronously so the write is queued before the page goes away.
+  const flushSave = useCallback(() => {
+    if (saveTimer.current) window.clearTimeout(saveTimer.current);
+    saveTimer.current = null;
+    const pending = pendingSave.current;
+    pendingSave.current = null;
+    if (!pending) return;
+    void idbSet(STORE_FOG, pending.path, maskToBlobSync(pending.mask)).catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") flushSave();
+    };
+    window.addEventListener("pagehide", flushSave);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      flushSave();
+      window.removeEventListener("pagehide", flushSave);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [flushSave]);
 
   const reportHistory = useCallback(() => {
     const key = entryRef.current?.path;
@@ -172,7 +221,7 @@ export const DirectorStage = forwardRef<DirectorStageHandle, Props>(function Dir
       if (!snapshot) return;
       writeMaskAlpha(mask, snapshot);
       draw();
-      persistMask();
+      saveNow();
       reportHistory();
       if (liveRef.current) {
         void maskToBlob(mask).then((fog) => {
@@ -180,7 +229,7 @@ export const DirectorStage = forwardRef<DirectorStageHandle, Props>(function Dir
         });
       }
     },
-    [draw, persistMask, reportHistory],
+    [draw, saveNow, reportHistory],
   );
 
   useImperativeHandle(
@@ -195,14 +244,14 @@ export const DirectorStage = forwardRef<DirectorStageHandle, Props>(function Dir
         fillMask(mask, mode);
         draw();
         if (liveRef.current) channelRef.current?.post({ type: "fill", mode });
-        persistMask();
+        saveNow();
       },
       resetView: () => {
         viewRef.current = { zoom: 1, panX: 0, panY: 0 };
         draw();
       },
     }),
-    [draw, persistMask, recordFog, restoreFog],
+    [draw, saveNow, recordFog, restoreFog],
   );
 
   // Broadcast channel
@@ -219,6 +268,8 @@ export const DirectorStage = forwardRef<DirectorStageHandle, Props>(function Dir
 
   // Load the active map (image or video)
   useEffect(() => {
+    // the previous map's pending fog save goes to the previous map
+    flushSave();
     let cancelled = false;
     setReady(false);
     viewRef.current = { zoom: 1, panX: 0, panY: 0 };
@@ -260,7 +311,7 @@ export const DirectorStage = forwardRef<DirectorStageHandle, Props>(function Dir
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     };
-  }, [entry, draw, sendScene, reportHistory]);
+  }, [entry, draw, sendScene, reportHistory, flushSave]);
 
   // Pushing a newly-live map (or re-selecting the live one) sends the full scene
   useEffect(() => {
@@ -378,6 +429,8 @@ export const DirectorStage = forwardRef<DirectorStageHandle, Props>(function Dir
   };
 
   const endDrag = () => {
+    // a finished brush stroke is saved straight away
+    if (dragRef.current && dragRef.current.mode !== "pan") saveNow();
     dragRef.current = null;
   };
 
