@@ -21,6 +21,10 @@ export function watchErrors(page: Page, label = "page") {
 }
 
 export async function pickMapFolder(page: Page, folder = "maps") {
+  // after a reload, wait until the app has started before picking (Firefox
+  // could otherwise set the files before React attached its change handler)
+  await expect(page.getByText("Director View")).toBeVisible();
+  await page.waitForLoadState("networkidle");
   await page.locator("input[webkitdirectory]").setInputFiles(fixture(folder));
   await expect(page.getByText(/Loaded \d+ maps?/)).toBeVisible();
 }
